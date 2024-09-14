@@ -8,15 +8,13 @@ import models
 import pydan_models
 from database import SessionLocal, engine
 
-# Create the database tables
-models.Base.metadata.create_all(bind=engine)
 
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Dependency for DB session
 def get_db():
     db = SessionLocal()
     try:
@@ -24,28 +22,64 @@ def get_db():
     finally:
         db.close()
 
-# POST: Create a new workout
+
 @app.post("/workouts/", response_model=pydan_models.WorkoutDetails)
 def create_workout(workout: pydan_models.WorkoutCreate, db: Session = Depends(get_db)):
+    """
+    Create a new workout
+
+    Parameters:
+        Takes in a WorkoutCreate instance 
+
+    Returns:
+        list[Organization]: All `Organization`s in the `Organization` database table
+    """
     return service.create_workout(db=db, workout=workout)
 
-# GET: Retrieve workouts with optional filtering
+
 @app.get("/workouts/", response_model=List[pydan_models.WorkoutDetails])
 def get_workouts(db: Session = Depends(get_db)):
+    """
+    Get workouts
+
+    Parameters:
+        n/a
+
+    Returns:
+        All workouts in the database using get_workouts service method.
+    """
     workouts = service.get_workouts(db)
     return workouts
 
-# GET: Retrieve a specific workout by ID
+
 @app.get("/workouts/{workout_id}", response_model=pydan_models.WorkoutDetails)
 def get_workout_by_id(workout_id: int, db: Session = Depends(get_db)):
+    """
+    Get workout given a specific id
+
+    Parameters:
+        workout_id: A valid integer id 
+
+    Returns:
+        The workout at an ID if existing, else 404 error
+    """
     db_workout = service.get_workout(db, workout_id=workout_id)
     if db_workout is None:
         raise HTTPException(status_code=404, detail="Workout not found")
     return db_workout
 
-# DELETE: Remove a workout by ID
+
 @app.delete("/workouts/{workout_id}", response_model=pydan_models.WorkoutDetails)
 def delete_workout(workout_id: int, db: Session = Depends(get_db)):
+    """
+    Delete a workout given an id
+
+    Parameters:
+        workout_id: A valid_ID
+
+    Returns:
+       Workout that was deleted 
+    """
     db_workout = service.get_workout(db, workout_id=workout_id)
     if db_workout is None:
         raise HTTPException(status_code=404, detail="Workout not found")

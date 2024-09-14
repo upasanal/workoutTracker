@@ -9,12 +9,14 @@ class Workout(Base):
     __tablename__ = "workouts"
 
     id = mapped_column(Integer, primary_key=True, index=True)
-    date_time = mapped_column(DateTime, server_default=func.now())  
-    duration = mapped_column(Float, nullable=False)  # Duration in minutes
-    distance = mapped_column(Float, nullable=False)  # Distance in kilometers
+    date_time = mapped_column(DateTime, server_default=func.now())  # The SQL now() datetime function - https://docs.sqlalchemy.org/en/20/core/functions.html
+    duration = mapped_column(Float, nullable=False)  
+    distance = mapped_column(Float, nullable=False) 
     route= mapped_column(String, nullable=True)  # Optional
-    heart_rate = mapped_column(Integer, nullable=True)
-    photo_url = Column(String, nullable=True)   # Optional
-    # Default to current time
+    heart_rate = mapped_column(Integer, nullable=True) # Optional
+    photo_url = Column(String, nullable=True) # Optional
+    weather = Column(String, nullable=True) # Optional
+
+
 
 
